@@ -1,0 +1,144 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class BankAccount {
+    private String accountNumber;
+    private String ownerName;
+    private double balance;
+
+    public BankAccount(String accountNumber, String ownerName) {
+        this.accountNumber = accountNumber;
+        this.ownerName = ownerName;
+        this.balance = 0.0;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposit of $" + amount + " successful.");
+    }
+
+    public void withdraw(double amount) {
+        if (amount > balance) {
+            System.out.println("Insufficient funds.");
+        } else {
+            balance -= amount;
+            System.out.println("Withdrawal of $" + amount + " successful.");
+        }
+    }
+}
+
+class OnlineBankingSystem {
+    private Map<String, BankAccount> accounts;
+    private Map<String, String> loginCredentials;
+
+    public OnlineBankingSystem() {
+        this.accounts = new HashMap<>();
+        this.loginCredentials = new HashMap<>();
+    }
+
+    public void createAccount(String accountNumber, String ownerName, String password) {
+        accounts.put(accountNumber, new BankAccount(accountNumber, ownerName));
+        loginCredentials.put(accountNumber, password);
+        System.out.println("Account created successfully.");
+    }
+
+    public boolean login(String accountNumber, String password) {
+        return loginCredentials.containsKey(accountNumber) && loginCredentials.get(accountNumber).equals(password);
+    }
+
+    public BankAccount getAccount(String accountNumber) {
+        return accounts.get(accountNumber);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        OnlineBankingSystem bankingSystem = new OnlineBankingSystem();
+
+        while (true) {
+            System.out.println("\nWelcome to Online Banking System!");
+            System.out.println("1. Create Account");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter account number: ");
+                    String accNumber = scanner.next();
+                    System.out.print("Enter owner name: ");
+                    String ownerName = scanner.next();
+                    System.out.print("Enter password: ");
+                    String password = scanner.next();
+                    bankingSystem.createAccount(accNumber, ownerName, password);
+                    break;
+                case 2:
+                    System.out.print("Enter account number: ");
+                    accNumber = scanner.next();
+                    System.out.print("Enter password: ");
+                    password = scanner.next();
+                    if (bankingSystem.login(accNumber, password)) {
+                        BankAccount account = bankingSystem.getAccount(accNumber);
+                        handleLoggedIn(account, scanner);
+                    } else {
+                        System.out.println("Invalid account number or password.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("Thank you for using Online Banking System. Goodbye!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void handleLoggedIn(BankAccount account, Scanner scanner) {
+        while (true) {
+            System.out.println("\nLogged in as " + account.getOwnerName());
+            System.out.println("1. Deposit");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Check Balance");
+            System.out.println("4. Logout");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter deposit amount: $");
+                    double depositAmount = scanner.nextDouble();
+                    account.deposit(depositAmount);
+                    break;
+                case 2:
+                    System.out.print("Enter withdrawal amount: $");
+                    double withdrawAmount = scanner.nextDouble();
+                    account.withdraw(withdrawAmount);
+                    break;
+                case 3:
+                    System.out.println("Current balance: $" + account.getBalance());
+                    break;
+                case 4:
+                    System.out.println("Logged out successfully.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
